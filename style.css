@@ -1,84 +1,61 @@
 body {
     font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f7fb;
     margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
+}
+
+.container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
     text-align: center;
 }
 
-header {
-    background-color: #0052cc;
-    color: white;
-    padding: 20px;
+h1 {
+    font-size: 1.5rem;
+    color: #1a2a44;
+    margin-bottom: 1.5rem;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 2em;
-}
-
-header p {
-    margin: 10px 0 0;
-}
-
-.password-tester {
-    background-color: white;
-    border: 1px solid #0052cc;
-    border-radius: 10px;
-    margin: 20px auto;
-    padding: 20px;
-    width: 80%;
-    max-width: 400px;
-}
-
-.password-tester label {
-    display: block;
-    margin-bottom: 10px;
-    color: #0052cc;
-}
-
-.password-tester input {
+input[type="password"] {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
 }
 
-.result {
-    margin-top: 20px;
+.strength-meter {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.strength-meter div {
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.feedback {
+    font-size: 0.9rem;
+    color: #4b5563;
+    min-height: 1.5rem;
     text-align: left;
 }
 
-.result p {
-    margin: 5px 0;
-}
-
-#strength, #crack-time {
-    color: #ff4d4f;
-    font-weight: bold;
-}
-
-footer {
-    margin: 20px;
-}
-
-footer h2 {
-    color: #0052cc;
-    font-size: 1.5em;
-}
-
-details {
-    background-color: #e6f0ff;
-    border-radius: 5px;
-    margin: 10px auto;
-    padding: 10px;
-    width: 80%;
-    max-width: 400px;
-    text-align: left;
-}
-
-summary {
-    cursor: pointer;
-    color: #0052cc;
-}
+/* Strength colors */
+.weak { background-color: #ef4444; }
+.medium { background-color: #f59e0b; }
+.strong { background-color: #10b981; }
