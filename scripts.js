@@ -1,48 +1,64 @@
-function checkPassword() {
+function checkPasswordStrength() {
     const password = document.getElementById('password').value;
-    const strengthSpan = document.getElementById('strength');
-    const crackTimeSpan = document.getElementById('crack-time');
+    const strengthBar = document.getElementById('strength-bar');
+    const feedback = document.getElementById('feedback');
 
+    // Initialize variables
     let strength = 0;
+    let feedbackText = '';
 
-    // Criteria for strength
-    if (password.length > 0) strength++; // At least 1 character
-    if (password.length >= 8) strength++; // At least 8 characters
-    if (/[A-Z]/.test(password)) strength++; // Contains uppercase
-    if (/[a-z]/.test(password)) strength++; // Contains lowercase
-    if (/[0-9]/.test(password)) strength++; // Contains numbers
-    if (/[^A-Za-z0-9]/.test(password)) strength++; // Contains special characters
-
-    // Determine strength and crack time
-    let strengthText = 'very weak';
-    let crackTime = 'less than a second';
-    let color = '#ff4d4f'; // Red for weak
-
-    if (strength <= 2) {
-        strengthText = 'very weak';
-        crackTime = 'less than a second';
-        color = '#ff4d4f';
-    } else if (strength === 3) {
-        strengthText = 'weak';
-        crackTime = 'a few seconds';
-        color = '#ff4d4f';
-    } else if (strength === 4) {
-        strengthText = 'moderate';
-        crackTime = 'a few minutes';
-        color = '#ffa500'; // Orange for moderate
-    } else if (strength === 5) {
-        strengthText = 'strong';
-        crackTime = 'a few hours';
-        color = '#32cd32'; // Green for strong
-    } else if (strength === 6) {
-        strengthText = 'very strong';
-        crackTime = 'several days';
-        color = '#32cd32';
+    // Check password length
+    if (password.length > 0) {
+        strength += Math.min(password.length * 10, 30); // Up to 30% for length
     }
 
-    // Update the UI
-    strengthSpan.textContent = strengthText;
-    crackTimeSpan.textContent = crackTime;
-    strengthSpan.style.color = color;
-    crackTimeSpan.style.color = color;
+    // Check for uppercase letters
+    if (/[A-Z]/.test(password)) {
+        strength += 20;
+        feedbackText += 'Includes uppercase letters. ';
+    }
+
+    // Check for lowercase letters
+    if (/[a-z]/.test(password)) {
+        strength += 20;
+        feedbackText += 'Includes lowercase letters. ';
+    }
+
+    // Check for numbers
+    if (/[0-9]/.test(password)) {
+        strength += 20;
+        feedbackText += 'Includes numbers. ';
+    }
+
+    // Check for special characters
+    if (/[^A-Za-z0-9]/.test(password)) {
+        strength += 20;
+        feedbackText += 'Includes special characters. ';
+    }
+
+    // Adjust strength based on length penalties
+    if (password.length < 8) {
+        strength = Math.min(strength, 30);
+        feedbackText = 'Password is too short. Use at least 8 characters.';
+    } else if (password.length >= 12) {
+        strength = Math.min(strength + 10, 100); // Bonus for longer passwords
+    }
+
+    // Update strength bar
+    strengthBar.style.width = `${strength}%`;
+    strengthBar.className = ''; // Reset classes
+
+    if (strength <= 30) {
+        strengthBar.classList.add('weak');
+        feedbackText = feedbackText || 'Weak: Add more characters and variety.';
+    } else if (strength <= 70) {
+        strengthBar.classList.add('medium');
+        feedbackText = feedbackText || 'Medium: Consider adding special characters or more length.';
+    } else {
+        strengthBar.classList.add('strong');
+        feedbackText = feedbackText || 'Strong: Great password!';
+    }
+
+    // Update feedback text
+    feedback.textContent = feedbackText;
 }
