@@ -3,23 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Strength Checker</title>
+    <title>Password Strength Tester</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Password Strength Checker</h1>
-        <input type="password" id="password" placeholder="Enter your password" oninput="checkPasswordStrength()">
-        <div id="strengthMessage"></div>
-        <div id="crackTimeMessage"></div>
-        <ul id="requirements">
-            <li id="length">At least 8 characters</li>
-            <li id="uppercase">An uppercase letter</li>
-            <li id="lowercase">A lowercase letter</li>
-            <li id="numbers">A number</li>
-            <li id="special">A special character</li>
-        </ul>
-    </div>
+    <header>
+        <h1>Password Strength Testing Tool</h1>
+        <p>Think you have a strong password? Find out below.</p>
+    </header>
+    <main>
+        <div class="password-tester">
+            <label for="password">Evaluate your password:</label>
+            <input type="text" id="password" placeholder="Enter your password" onkeyup="checkPassword()">
+            <div class="result">
+                <p>Your password strength: <span id="strength">very weak</span></p>
+                <p>Estimated time to crack: <span id="crack-time">less than a second</span></p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <h2>Password FAQ</h2>
+        <details>
+            <summary>Is it safe to type my real password here?</summary>
+            <p>For security, avoid using your real password on any testing tool. Use a similar password instead.</p>
+        </details>
+        <details>
+            <summary>How do you calculate password strength?</summary>
+            <p>We evaluate based on length, and the use of uppercase, lowercase, numbers, and special characters.</p>
+        </details>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>
