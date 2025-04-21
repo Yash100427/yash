@@ -4,34 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Strength Tester</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7fb;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #1a2a44;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .strength-meter {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .strength-meter div {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .feedback {
+            font-size: 0.9rem;
+            color: #4b5563;
+            min-height: 1.5rem;
+            text-align: left;
+        }
+
+        /* Strength colors */
+        .weak { background-color: #ef4444; }
+        .medium { background-color: #f59e0b; }
+        .strong { background-color: #10b981; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Password Strength Testing Tool</h1>
-        <p>Think you have a strong password? Find out below.</p>
-    </header>
-    <main>
-        <div class="password-tester">
-            <label for="password">Evaluate your password:</label>
-            <input type="text" id="password" placeholder="Enter your password" onkeyup="checkPassword()">
-            <div class="result">
-                <p>Your password strength: <span id="strength">very weak</span></p>
-                <p>Estimated time to crack: <span id="crack-time">less than a second</span></p>
-            </div>
+    <div class="container">
+        <h1>Password Strength Tester</h1>
+        <input type="password" id="password" placeholder="Enter your password" oninput="checkPasswordStrength()">
+        <div class="strength-meter">
+            <div id="strength-bar"></div>
         </div>
-    </main>
-    <footer>
-        <h2>Password FAQ</h2>
-        <details>
-            <summary>Is it safe to type my real password here?</summary>
-            <p>For security, avoid using your real password on any testing tool. Use a similar password instead.</p>
-        </details>
-        <details>
-            <summary>How do you calculate password strength?</summary>
-            <p>We evaluate based on length, and the use of uppercase, lowercase, numbers, and special characters.</p>
-        </details>
-    </footer>
-    <script src="script.js"></script>
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthBar = document.getElementById('strength-bar');
+            const feedback = document.getElementById('feedback');
+
+            // Initialize variables
+            let strength = 0;
+            let feedbackText = '';
+
+            // Check password length
+            if (password.length > 0) {
+                strength += Math.min(password.length * 10, 30); // Up to 30% for length
+            }
+
+            // Check for uppercase letters
+            if (/[A-Z]/.test(password)) {
+                strength += 20;
+                feedbackText += 'Includes uppercase letters. ';
+            }
+
+            // Check for lowercase letters
+            if (/[a-z]/.test(password)) {
+                strength += 20;
+                feedbackText += 'Includes lowercase letters. ';
+            }
+
+            // Check for numbers
+            if (/[0-9]/.test(password)) {
+                strength += 20;
+                feedbackText += 'Includes numbers. ';
+            }
+
+            // Check for special characters
+            if (/[^A-Za-z0-9]/.test(password)) {
+                strength += 20;
+                feedbackText += 'Includes special characters. ';
+            }
+
+            // Adjust strength based on length penalties
+            if (password.length < 8) {
+                strength = Math.min(strength, 30);
+                feedbackText = 'Password is too short. Use at least 8 characters.';
+            } else if (password.length >= 12) {
+                strength = Math.min(strength + 10, 100); // Bonus for longer passwords
+            }
+
+            // Update strength bar
+            strengthBar.style.width = `${strength}%`;
+            strengthBar.className = ''; // Reset classes
+
+            if (strength <= 30) {
+                strengthBar.classList.add('weak');
+                feedbackText = feedbackText || 'Weak: Add more characters and variety.';
+            } else if (strength <= 70) {
+                strengthBar.classList.add('medium');
+                feedbackText = feedbackText || 'Medium: Consider adding special characters or more length.';
+            } else {
+                strengthBar.classList.add('strong');
+                feedbackText = feedbackText || 'Strong: Great password!';
+            }
+
+            // Update feedback text
+            feedback.textContent = feedbackText;
+        }
+    </script>
 </body>
 </html>
