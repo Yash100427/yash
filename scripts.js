@@ -1,99 +1,48 @@
-function checkPasswordStrength() {
+function checkPassword() {
     const password = document.getElementById('password').value;
-    const strengthMessage = document.getElementById('strengthMessage');
-    const crackTimeMessage = document.getElementById('crackTimeMessage');
-    const requirements = {
-        length: document.getElementById('length'),
-        uppercase: document.getElementById('uppercase'),
-        lowercase: document.getElementById('lowercase'),
-        numbers: document.getElementById('numbers'),
-        special: document.getElementById('special')
-    };
+    const strengthSpan = document.getElementById('strength');
+    const crackTimeSpan = document.getElementById('crack-time');
 
-    let strength = 'Weak';
-    let color = 'red';
+    let strength = 0;
 
-    if (password.length >= 8) {
-        requirements.length.classList.add('met');
-    } else {
-        requirements.length.classList.remove('met');
+    // Criteria for strength
+    if (password.length > 0) strength++; // At least 1 character
+    if (password.length >= 8) strength++; // At least 8 characters
+    if (/[A-Z]/.test(password)) strength++; // Contains uppercase
+    if (/[a-z]/.test(password)) strength++; // Contains lowercase
+    if (/[0-9]/.test(password)) strength++; // Contains numbers
+    if (/[^A-Za-z0-9]/.test(password)) strength++; // Contains special characters
+
+    // Determine strength and crack time
+    let strengthText = 'very weak';
+    let crackTime = 'less than a second';
+    let color = '#ff4d4f'; // Red for weak
+
+    if (strength <= 2) {
+        strengthText = 'very weak';
+        crackTime = 'less than a second';
+        color = '#ff4d4f';
+    } else if (strength === 3) {
+        strengthText = 'weak';
+        crackTime = 'a few seconds';
+        color = '#ff4d4f';
+    } else if (strength === 4) {
+        strengthText = 'moderate';
+        crackTime = 'a few minutes';
+        color = '#ffa500'; // Orange for moderate
+    } else if (strength === 5) {
+        strengthText = 'strong';
+        crackTime = 'a few hours';
+        color = '#32cd32'; // Green for strong
+    } else if (strength === 6) {
+        strengthText = 'very strong';
+        crackTime = 'several days';
+        color = '#32cd32';
     }
 
-    if (/[A-Z]/.test(password)) {
-        requirements.uppercase.classList.add('met');
-    } else {
-        requirements.uppercase.classList.remove('met');
-    }
-
-    if (/[a-z]/.test(password)) {
-        requirements.lowercase.classList.add('met');
-    } else {
-        requirements.lowercase.classList.remove('met');
-    }
-
-    if (/\d/.test(password)) {
-        requirements.numbers.classList.add('met');
-    } else {
-        requirements.numbers.classList.remove('met');
-    }
-
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-        requirements.special.classList.add('met');
-    } else {
-        requirements.special.classList.remove('met');
-    }
-
-    const conditionsMet = Object.values(requirements).filter(item => item.classList.contains('met')).length;
-
-    if (conditionsMet >= 4) {
-        strength = 'Strong';
-        color = 'green';
-    } else if (conditionsMet >= 3) {
-        strength = 'Medium';
-        color = 'orange';
-    }
-
-    strengthMessage.textContent = `Password Strength: ${strength}`;
-    strengthMessage.style.color = color;
-
-    const crackTime = estimateCrackTime(password);
-    crackTimeMessage.textContent = `Estimated Time to Crack: ${crackTime}`;
+    // Update the UI
+    strengthSpan.textContent = strengthText;
+    crackTimeSpan.textContent = crackTime;
+    strengthSpan.style.color = color;
+    crackTimeSpan.style.color = color;
 }
-
-function estimateCrackTime(password) {
-    const charSetSize = getCharSetSize(password);
-    const combinations = Math.pow(charSetSize, password.length);
-    const attemptsPerSecond = 1e10; // 10 billion attempts per second
-    const seconds = combinations / attemptsPerSecond;
-
-    return formatTime(seconds);
-}
-
-function getCharSetSize(password) {
-    let size = 0;
-    if (/[a-z]/.test(password)) size += 26;
-    if (/[A-Z]/.test(password)) size += 26;
-    if (/\d/.test(password)) size += 10;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) size += 32;
-    return size;
-}
-
-function formatTime(seconds) {
-    const units = [
-        { label: 'years', value: 60 * 60 * 24 * 365 },
-        { label: 'days', value: 60 * 60 * 24 },
-        { label: 'hours', value: 60 * 60 },
-        { label: 'minutes', value: 60 },
-        { label: 'seconds', value: 1 }
-    ];
-
-    for (const unit of units) {
-        const quotient = Math.floor(seconds / unit.value);
-        if (quotient > 0) {
-            return `${quotient} ${unit.label}`;
-        }
-    }
-
-    return 'less than a second';
-}
-
