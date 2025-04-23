@@ -1,64 +1,110 @@
+// Common passwords (simplified for demo)
+const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein'];
+
+// Check password strength
 function checkPasswordStrength() {
     const password = document.getElementById('password').value;
-    const strengthBar = document.getElementById('strength-bar');
-    const feedback = document.getElementById('feedback');
+    const feedbackList = document.getElementById('feedback');
+    const progressBar = document.getElementById('progress-bar');
+    const strengthText = document.getElementById('strength-text');
 
-    // Initialize variables
-    let strength = 0;
-    let feedbackText = '';
+    let score = 0;
+    let feedback = [];
 
-    // Check password length
-    if (password.length > 0) {
-        strength += Math.min(password.length * 10, 30); // Up to 30% for length
-    }
-
-    // Check for uppercase letters
-    if (/[A-Z]/.test(password)) {
-        strength += 20;
-        feedbackText += 'Includes uppercase letters. ';
-    }
-
-    // Check for lowercase letters
-    if (/[a-z]/.test(password)) {
-        strength += 20;
-        feedbackText += 'Includes lowercase letters. ';
-    }
-
-    // Check for numbers
-    if (/[0-9]/.test(password)) {
-        strength += 20;
-        feedbackText += 'Includes numbers. ';
-    }
-
-    // Check for special characters
-    if (/[^A-Za-z0-9]/.test(password)) {
-        strength += 20;
-        feedbackText += 'Includes special characters. ';
-    }
-
-    // Adjust strength based on length penalties
+    // Length check
     if (password.length < 8) {
-        strength = Math.min(strength, 30);
-        feedbackText = 'Password is too short. Use at least 8 characters.';
-    } else if (password.length >= 12) {
-        strength = Math.min(strength + 10, 100); // Bonus for longer passwords
-    }
-
-    // Update strength bar
-    strengthBar.style.width = `${strength}%`;
-    strengthBar.className = ''; // Reset classes
-
-    if (strength <= 30) {
-        strengthBar.classList.add('weak');
-        feedbackText = feedbackText || 'Weak: Add more characters and variety.';
-    } else if (strength <= 70) {
-        strengthBar.classList.add('medium');
-        feedbackText = feedbackText || 'Medium: Consider adding special characters or more length.';
+        feedback.push('Password must be at least 8 characters.');
     } else {
-        strengthBar.classList.add('strong');
-        feedbackText = feedbackText || 'Strong: Great password!';
+        score += password.length * 4;
     }
 
-    // Update feedback text
-    feedback.textContent = feedbackText;
+    // Character types
+    if (/[A-Z]/.test(password)) score += 10;
+    else feedback.push('Add uppercase letters.');
+    if (/[a-z]/.test(password)) score += 10;
+    else feedback.push('Add lowercase letters.');
+    if (/[0-9]/.test(password)) score += 10;
+    else feedback.push('Add numbers.');
+    if (/[^A-Za-z0-9]/.test(password)) score += 10;
+    else feedback.push('Add special characters.');
+
+    // Repetitive or sequential characters
+    if (/(.)\1{2,}/.test(password)) {
+        score -= 10;
+        feedback.push('Avoid repetitive characters.');
+    }
+    if (/(123|abc|qwe)/i.test(password)) {
+        score -= 10;
+        feedback.push('Avoid sequential patterns.');
+    }
+
+    // Common passwords
+    if (commonPasswords.includes(password.toLowerCase())) {
+        score = 0;
+        feedback.push('This is a common password. Choose a unique one.');
+    }
+
+    // Entropy calculation (simplified)
+    let charset = 0;
+    if (/[a-z]/.test(password)) charset += 26;
+    if (/[A-Z]/.test(password)) charset += 26;
+    if (/[0-9]/.test(password)) charset += 10;
+    if (/[^A-Za-z0-9]/.test(password)) charset += 32;
+    const entropy = password.length * Math.log2(charset);
+    score += Math.min(entropy / 2, 30); // Cap entropy contribution
+
+    // Update UI
+    let strength = 'Weak';
+    let progressWidth = Math.min(score, 100);
+    let progressClass = 'progress-weak';
+
+    if (score >= 60) {
+        strength = 'Strong';
+        progressClass = 'progress-strong';
+    } else if (score >= 30) {
+        strength = 'Medium';
+        progressClass = 'progress-medium';
+    }
+
+    progressBar.style.width = `${progressWidth}%`;
+    progressBar.className = `progress-bar ${progressClass}`;
+    strengthText.textContent = `Password Strength: ${strength}`;
+    feedbackList.innerHTML = feedback.map(item => `<li>${item}</li>`).join('');
 }
+
+// Toggle password visibility
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+        `;
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        `;
+    }
+}
+
+// Generate random password
+function generatePassword() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+    const length = 12;
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('password').value = password;
+    checkPasswordStrength();
+}
+
+// Add event listener for real-time password checking
+document.getElementById('password').addEventListener('input', checkPasswordStrength);
