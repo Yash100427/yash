@@ -108,3 +108,60 @@ function generatePassword() {
 
 // Add event listener for real-time password checking
 document.getElementById('password').addEventListener('input', checkPasswordStrength);
+
+function estimateCrackTime(password) {
+  if (!password) return "N/A";
+
+  // Define character set sizes
+  const charSets = {
+    lowercase: /[a-z]/.test(password) ? 26 : 0,
+    uppercase: /[A-Z]/.test(password) ? 26 : 0,
+    digits: /[0-9]/.test(password) ? 10 : 0,
+    special: /[^a-zA-Z0-9]/.test(password) ? 32 : 0,
+  };
+
+  // Total character set size
+  const charsetSize = Object.values(charSets).reduce((sum, size) => sum + size, 0);
+  if (charsetSize === 0) return "N/A";
+
+  // Calculate total combinations
+  const combinations = Math.pow(charsetSize, password.length);
+
+  // Assume 10 billion attempts per second (modern GPU cracking speed)
+  const attemptsPerSecond = 10_000_000_000;
+  const secondsToCrack = combinations / attemptsPerSecond;
+
+  // Convert to human-readable format
+  if (secondsToCrack < 60) {
+    return `${Math.round(secondsToCrack)} second${secondsToCrack !== 1 ? "s" : ""}`;
+  } else if (secondsToCrack < 3600) {
+    const minutes = Math.round(secondsToCrack / 60);
+    return `${minutes} minute${minutes !== 1 ? "s" : ""}`;
+  } else if (secondsToCrack < 86400) {
+    const hours = Math.round(secondsToCrack / 3600);
+    return `${hours} hour${hours !== 1 ? "s" : ""}`;
+  } else if (secondsToCrack < 31536000) {
+    const days = Math.round(secondsToCrack / 86400);
+    return `${days} day${days !== 1 ? "s" : ""}`;
+  } else {
+    const years = Math.round(secondsToCrack / 31536000);
+    return `${years} year${years !== 1 ? "s" : ""}`;
+  }
+}
+
+// Update your existing event listener (assuming it exists)
+const passwordInput = document.getElementById("password-input");
+const crackTimeValue = document.getElementById("crack-time-value");
+
+passwordInput.addEventListener("input", function () {
+  const password = this.value;
+  // Assuming you have a checkPasswordStrength function
+  checkPasswordStrength(password); // Your existing function
+  crackTimeValue.textContent = estimateCrackTime(password);
+});
+const faqToggle = document.getElementById("faq-toggle");
+const faqSection = document.getElementById("faq-section");
+
+faqToggle.addEventListener("click", function () {
+  faqSection.classList.toggle("hidden");
+});
