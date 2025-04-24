@@ -108,4 +108,3 @@ function generatePassword() {
 
 // Add event listener for real-time password checking
 document.getElementById('password').addEventListener('input', checkPasswordStrength);
-
